@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import app1, app2
+from apps import app1, app2, app3
 
 
 app.layout = html.Div([
@@ -15,6 +15,8 @@ index_page = html.Div([
     dcc.Link('Go to Page 1', href='/apps/app1'),
     html.Br(),
     dcc.Link('Go to Page 2', href='/apps/app2'),
+    html.Br(),
+    dcc.Link('Go to Page 3', href='/apps/app3'),
 ])
 
 
@@ -25,6 +27,8 @@ def display_page(pathname):
         return app1.layout
     elif pathname == '/apps/app2':
         return app2.layout
+    elif pathname == '/apps/app3':
+        return app3.layout
     else:
         return index_page
 

@@ -23,14 +23,14 @@ layout = html.Div(
             id='graph-update',
             interval=1*1500
         ),
-        dcc.Link('Go to App 1', href='/apps/app1')
+        dcc.Link('Go to Homepage', href='/')
     ]
 )
 
 @app.callback(Output('live-graph', 'figure'),
               [Input('graph-update', 'n_intervals')])
 
-def update_graph_scatter(n):
+def update_graph_scatter(n_intervals):
     X.append(X[-1]+1)
     Y.append(Y[-1]+Y[-1]*random.uniform(-0.1,0.1))
 
