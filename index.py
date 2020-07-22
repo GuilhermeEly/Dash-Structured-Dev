@@ -12,11 +12,11 @@ app.layout = html.Div([
 ])
 
 index_page = html.Div([
-    dcc.Link('Go to Page 1', href='/apps/app1'),
+    dcc.Link('Ir para app 1', href='/apps/app1'),
     html.Br(),
-    dcc.Link('Go to Page 2', href='/apps/app2'),
+    dcc.Link('Ir para app 2', href='/apps/app2'),
     html.Br(),
-    dcc.Link('Go to Page 3', href='/apps/app3'),
+    dcc.Link('Ir para app 3', href='/apps/app3'),
 ])
 
 
