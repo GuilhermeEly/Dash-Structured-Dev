@@ -12,8 +12,9 @@ layout = html.Div(
         html.H3('App 3'),
         dcc.DatePickerRange(
             id='date-picker-range',
-            start_date=dt(1997, 5, 3),
-            end_date_placeholder_text='Selecione uma data:'
+            display_format='DD/MM/YYYY',
+            start_date_placeholder_text='Data início',
+            end_date_placeholder_text='Data fim'
         ),
         html.Br(),
         html.Br(),
