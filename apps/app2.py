@@ -41,6 +41,6 @@ def update_graph_scatter(n):
             mode= 'lines+markers'
             )
 
-    return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[min(X),max(X)]),
-                                                yaxis=dict(range=[min(Y),max(Y)]),)}
+    return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[min(X)-1,max(X)+1]),
+                                                yaxis=dict(range=[min(Y)-0.1,max(Y)+0.1]),)}
 
