@@ -4,7 +4,7 @@ from app import app
 
 import pandas as pd
 
-dfo = pd.read_csv('apps\dataset\data.csv')
+dfo = pd.read_csv(r'apps\dataset\data.csv')
 dfo.columns =[column.replace(" ", "_") for column in dfo.columns]
 
 #Retorna todos equipamentos Aprovados em alguma das etapas.
