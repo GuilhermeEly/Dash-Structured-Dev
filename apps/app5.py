@@ -37,6 +37,10 @@ dfReproved_AllSteps = dfo[dfo.SERIAL_EQUIP.isin(SNRep.SERIAL_EQUIP)]
 ##SEPARA OS DADOS POR DATA
 print(len(SNRep.index))
 print(dfrep.groupby('Data_Calibra')['Data_Calibra'].value_counts())
+print(dfap.groupby('Data_Calibra')['Data_Calibra'].value_counts())
+print(dfrep.groupby(['ORDEM_PROD','Tipo','Data_Calibra'])['ORDEM_PROD'].value_counts())
+
+dftest = dfrep.groupby(['ORDEM_PROD','Tipo','Data_Calibra'])['ORDEM_PROD'].value_counts()
 
 #Tentativa: Pegar o número de OP's únicas, verificar quais nomes de produtos únicos existem. Este número será considerado a 
 #quantidade de etapas de calibração existente. Então pegar o número de série e verificar se ele possui os "X" testes Aprovados
