@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -9,30 +11,31 @@ import dash_table
 
 import pandas as pd
 
-database = r"C:\Users\gely\dash_plotly\test\StructuredProject\Database\data\fpy_mockup.db"
+base_path = Path(__file__).parent
+database = (base_path / r"..\Database\data\fpy_mockup.db").resolve()
 conn = sqlite3.connect(database)
 
 cur = conn.cursor()
 
-query = """
-            SELECT z2.Z2_PRODUTO, z8.ZZ8_NUMEQ, z8.ZZ8_PNAME, z8.ZZ8_TIPO, z8.ZZ8_NUMBER
-            FROM SZ2 AS z2 
-            INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-            WHERE z8.ZZ8_NUMBER=16420930
-        """
-
-dfsql = pd.read_sql_query(query, conn)
-
+dfsql = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME, 
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                z8.ZZ8_DATE as DATA, z8.ZZ8_HOUR as HORA
+                FROM SZ2 AS z2 
+                INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
+                WHERE z2.Z2_PRODUTO=8024009080
+            """, conn)
 
 print(dfsql)
 
-dfo = pd.read_csv(r'apps\dataset\data.csv')
-dfo.columns =[column.replace(" ", "_") for column in dfo.columns]
+df_update_data = pd.read_csv(r'apps\dataset\data.csv')
+df_update_data.columns =[column.replace(" ", "_") for column in df_update_data.columns]
 
 #Transforma a coluna Data_Calibra em datetime
-dfo['Data_Calibra'] = pd.to_datetime(dfo['Data_Calibra'],format=r'%d/%m/%Y')
+df_update_data['Data_Calibra'] = pd.to_datetime(df_update_data['Data_Calibra'],format=r'%d/%m/%Y')
 
-Available_Filters = dfo.drop('Data_Calibra', 1)
+Available_Filters = df_update_data.drop('Data_Calibra', 1)
 
 layout = html.Div([
     html.Div([
@@ -80,21 +83,57 @@ layout = html.Div([
 def update_table(n_clicks,PA_Filter):
 
     if PA_Filter!= None:
-        database = r"C:\Users\gely\dash_plotly\test\StructuredProject\Database\data\fpy_mockup.db"
+
+        base_path = Path(__file__).parent
+        database = (base_path / r"..\Database\data\fpy_mockup.db").resolve()
+
         conn = sqlite3.connect(database)
 
-        query2 = """
-                SELECT z2.Z2_PRODUTO, z8.ZZ8_NUMEQ, z8.ZZ8_PNAME, z8.ZZ8_TIPO, z8.ZZ8_NUMBER
+        df_update_data = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                z8.ZZ8_DATE as DATA, z8.ZZ8_HOUR as HORA
                 FROM SZ2 AS z2 
                 INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-                WHERE z2.Z2_PRODUTO="""+str(PA_Filter)
+                WHERE z2.Z2_PRODUTO=(?) ORDER BY NS, DATA, HORA
+            """, conn, params=(str(PA_Filter),))
 
-        print(query2)
+        df_update_data.TIPO[df_update_data.TIPO == 1] = 'Calibração'
+        df_update_data.TIPO[df_update_data.TIPO == 2] = 'Validação'
+        df_update_data.STATUS[df_update_data.STATUS == 'A'] = 'Aprovado'
+        df_update_data.STATUS[df_update_data.STATUS == 'R'] = 'Reprovado'
 
-        dfsql2 = pd.read_sql_query(query2, conn)
-        dfsql2.ZZ8_TIPO[dfsql2.ZZ8_TIPO == 1] = 'Calibração'
-        dfsql2.ZZ8_TIPO[dfsql2.ZZ8_TIPO == 2] = 'Validação'
-        print(dfsql2)
+        dfrep = df_update_data.loc[(df_update_data['STATUS'] == "Reprovado")].drop_duplicates(subset = ["NS"])
+        print(df_update_data)
+        print(dfrep)
 
-        return dfsql2.to_dict('records')
+        SNRep = dfrep.filter(['NS'], axis=1)
+
+        dfRlyApproved = df_update_data[~df_update_data.NS.isin(SNRep.NS)].drop_duplicates(subset = ["NS"])
+
+        print(dfRlyApproved)
+
+        dftest = dfrep.groupby(['DATA']).size().reset_index(name='counts')
+
+        print(dftest)
+
+        #dfApprTest = dfRlyApproved.groupby(['DATA'])['DATA'].value_counts()
+        dfApprTest = dfRlyApproved.groupby(['DATA']).size().reset_index(name='counts')
+
+        print(dfApprTest)
+
+        dft = dftest['counts']/(dftest['counts']+dfApprTest['counts'])
+
+        dfFinal = pd.merge(dftest, dfApprTest, how='outer', on='DATA').fillna(0)
+
+        print(dfFinal)
+
+        dfFinal['fpy'] = dfFinal['counts_x'] /( dfFinal['counts_y'] + dfFinal['counts_x'])
+
+        dfFinal[['DATA', 'fpy']].fillna(0)
+
+        print(dfFinal)
+
+        return df_update_data.to_dict('records')
     
