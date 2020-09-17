@@ -10,7 +10,10 @@ ZZ9 = pd.read_csv(PATH2, delimiter=";", encoding = "ISO-8859-1")
 PATH3 = "C:\\Users\\gely\\dash_plotly\\test\\StructuredProject\\Database\\Excel\\SZ2u.csv"
 SZ2 = pd.read_csv(PATH3, delimiter=";", encoding = "ISO-8859-1")
 
-PATH4 = "C:\\Users\\gely\\dash_plotly\\test\\StructuredProject\\Database\\data\\fpy_mockup.db"
+ZZ9['ZZ9_DATE'] = pd.to_datetime(ZZ9['ZZ9_DATE'], format='%Y%m%d')
+ZZ8['ZZ8_DATE'] = pd.to_datetime(ZZ8['ZZ8_DATE'], format='%Y%m%d')
+
+PATH4 = "C:\\Users\\gely\\dash_plotly\\test\\StructuredProject\\Database\\data\\fpy_mockup2.db"
 db_conn = sqlite3.connect(PATH4)
 
 c = db_conn.cursor()
@@ -74,7 +77,7 @@ c.execute(
         ZZ8_NAMEOP TEXT,
         ZZ8_ORDNUM INTEGER,
         ZZ8_OPNUM INTEGER,
-        ZZ8_DATE INTEGER,
+        ZZ8_DATE DATE,
         ZZ8_HOUR TIME,
         ZZ8_STATUS TEXT,
         ZZ8_TIPO INTEGER,
@@ -106,7 +109,7 @@ c.execute(
         ZZ9_ERRO FLOAT,
         ZZ9_STATUS TEXT,
         ZZ9_SERIAL INTEGER,
-        ZZ9_DATE INTEGER,
+        ZZ9_DATE DATE,
         ZZ9_HOUR TIME,
         ZZ9_TIPO INTEGER,
         ZZ9_GAIN2 FLOAT,
@@ -120,3 +123,6 @@ c.execute(
 SZ2.to_sql('SZ2', db_conn, if_exists='append', index=False)
 ZZ9.to_sql('ZZ9', db_conn, if_exists='append', index=False)
 ZZ8.to_sql('ZZ8', db_conn, if_exists='append', index=False)
+
+ZZ8 = ZZ8.sort_values(by=['ZZ8_DATE'])
+print(ZZ8['ZZ8_DATE'])
