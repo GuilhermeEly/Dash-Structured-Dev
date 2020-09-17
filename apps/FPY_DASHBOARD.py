@@ -13,7 +13,7 @@ import sqlite3
 from app import app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-def get_fpy(start_date, end_date, Filter):
+def get_fpy_by_PA(start_date, end_date, Filter):
 
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = dt.strptime(end_date, "%Y-%m-%d")
@@ -32,7 +32,39 @@ def get_fpy(start_date, end_date, Filter):
             WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
         """, conn, params=(start_date, end_date))
 
-    return df_update_data
+    dfrep = df_update_data.loc[(df_update_data['STATUS'] == "R")].drop_duplicates(subset = ["NS"])
+
+    SNRep = dfrep.filter(['NS'], axis=1)
+
+    dfRlyApproved = df_update_data[~df_update_data.NS.isin(SNRep.NS)].drop_duplicates(subset = ["NS"])
+
+    dftest = dfrep.groupby(['PA']).size().reset_index(name='counts')
+
+    dfApprTest = dfRlyApproved.groupby(['PA']).size().reset_index(name='counts')
+
+    dfFinal = pd.merge(dftest, dfApprTest, how='outer', on='PA').fillna(0)
+
+    dfFinal['fpy'] = dfFinal['counts_y'] /( dfFinal['counts_y'] + dfFinal['counts_x'])
+
+    dfFinal['Produzido'] = dfFinal['counts_y'] + dfFinal['counts_x']
+
+    print(dfFinal)
+
+    dfFinal.rename(columns={"counts_y": "Aprovadas", "counts_x": "Reprovadas"}, inplace=True)
+
+    print(dfFinal)
+
+    dfFinal[['PA', 'fpy']].fillna(0)
+
+    dfFinal = dfFinal.sort_values(by=['fpy'])
+
+    dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+
+    dfFinal['PA'] = dfFinal['PA'].map(str)
+
+    dfFinal['fpy'] = dfFinal['fpy'].astype(float).map("{:.2%}".format)
+
+    return dfFinal
 
 layout = html.Div([
     html.Div([
@@ -67,13 +99,11 @@ layout = html.Div([
     
 
     html.Div([
-        dcc.Graph(id='crossfilter-indicator-scatter-fpy',
-                  hoverData={'points': [{'customdata': 'Japan'}]}
-        )
+        dcc.Graph(id='crossfilter-indicator-scatter-fpy')
     ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
     html.Div([
-        dcc.Graph(id='x-time-series'),
-        dcc.Graph(id='y-time-series'),
+        dcc.Graph(id='x-time-series-fpy'),
+        dcc.Graph(id='y-time-series-fpy'),
     ], style={'display': 'inline-block', 'width': '49%'}),
 ])
 
@@ -87,9 +117,26 @@ def update_table(n_clicks,Filter,start_date,end_date):
 
     if Filter!= 'not selected' and start_date!=None and end_date!=None:
         
-        print(get_fpy(start_date, end_date, Filter))
+        data = get_fpy_by_PA(start_date, end_date, Filter)
 
-        return dash.no_update
+        fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="PA", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+        fig.update_xaxes(type='category')
+        fig.update_layout(hovermode="x")
+
+        fig.update_layout(margin={'l': 0, 'b': 0, 't': 50, 'r': 0}, hovermode='closest')
+        return fig
     
     else:
         return dash.no_update
+
+@app.callback(
+    dash.dependencies.Output('x-time-series-fpy', 'figure'),
+    [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
+     dash.dependencies.Input('crossfilter-xaxis-column', 'value'),
+     dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
+def update_y_timeseries(hoverData, xaxis_column_name, axis_type):
+    country_name = hoverData['points'][0]['customdata']
+    dff = df[df['Country Name'] == country_name]
+    dff = dff[dff['Indicator Name'] == xaxis_column_name]
+    title = '<b>{}</b><br>{}'.format(country_name, xaxis_column_name)
+    return create_time_series(dff, axis_type, title)
