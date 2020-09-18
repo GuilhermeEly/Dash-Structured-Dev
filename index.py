@@ -58,7 +58,7 @@ def display_page(pathname):
 
 if __name__ == '__main__':
     #Para rodar em Desenvolvimento
-    app.run_server(debug=True)
+    #app.run_server(debug=True)
 
     #Para rodar em LAN
-    #app.run_server(debug=False, port=8080, host='0.0.0.0')
+    app.run_server(debug=False, port=8080, host='0.0.0.0')
