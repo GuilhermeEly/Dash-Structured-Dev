@@ -1,6 +1,6 @@
 import dash
-external_scripts = ['https://cdn.plot.ly/plotly-locale-pt-br-latest.js']
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-app = dash.Dash(__name__,external_scripts=external_scripts, suppress_callback_exceptions=True)
+app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
 app.scripts.config.serve_locally = False
 server = app.server

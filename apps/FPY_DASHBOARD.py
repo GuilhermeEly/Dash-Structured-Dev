@@ -15,6 +15,7 @@ import sqlite3
 #Caminho da aplicação
 from app import app
 
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 def get_timeseries_by_PA(start_date, end_date, PA):
     start_date = dt.strptime(start_date, "%Y-%m-%d")
@@ -151,8 +152,48 @@ layout = html.Div([
                 end_date_placeholder_text='Data fim',
                 display_format='DD/MM/YYYY'
             ),
+            html.Div([
+                dcc.Input(
+                    id='PA-Selction',
+                    placeholder='Busque um PA',
+                    type='text',
+                    style={
+                        'width':'200px', 
+                        'height':'40px', 
+                        'margin-left': '50px', 
+                        'verticalAlign':'middle', 
+                        'font-size':'22px', 
+                        'border':'1px solid #ccc'
+                    }
+                )
+            ],style={'display': 'inline-block'}),
+            html.Button(
+                id='submit-button-state', 
+                n_clicks=0, 
+                children='Submit',
+                style={
+                    'box-shadow':'inset 0px 1px 0px 0px #ffffff',
+                    'background':'linear-gradient(to bottom, #f9f9f9 5%, #e9e9e9 100%)',
+                    'background-color':'#f9f9f9;',
+                    'border':'1px solid #dcdcdc',
+                    'display':'inline-block',
+                    'cursor':'pointer',
+                    'color':'#666666',
+                    'font-family':'Arial',
+                    'font-size':'15px',
+                    'font-weight':'bold',
+                    'padding':'6px 24px',
+                    'text-decoration':'none',
+                    'text-shadow':'0px 1px 0px #ffffff',
+                    'height':'44px',
+                    'verticalAlign':'middle',
+                    'border-top-right-radius': '6px',
+                    'border-bottom-right-radius': '6px',
+                }
+            )
         ],
         style={'width': '49%', 'display': 'inline-block'}),
+        
 
         html.Div([
 
@@ -162,8 +203,11 @@ layout = html.Div([
                 value='Diario',
                 labelStyle={'display': 'inline-block'}
             ),
-            html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
-        ], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
+        ], style={
+            'width': '49%', 
+            'float': 'right', 
+            'display': 'inline-block'
+            })
     ], style={
         'borderBottom': 'thin lightgrey solid',
         'backgroundColor': 'rgb(250, 250, 250)',
@@ -200,6 +244,7 @@ def update_table(n_clicks,Filter,start_date,end_date):
         fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="PA", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
         fig.update_xaxes(type='category')
         fig.update_layout(hovermode="x")
+        fig.update_layout(clickmode='event+select')
 
         fig.update_layout(margin={'l': 0, 'b': 0, 't': 50, 'r': 0}, hovermode='closest')
         return fig
@@ -209,12 +254,15 @@ def update_table(n_clicks,Filter,start_date,end_date):
 
 @app.callback(
     dash.dependencies.Output('fpy-causes', 'figure'),
-    [dash.dependencies.Input('crossfilter-indicator-scatter-fpy', 'hoverData'),
+    [dash.dependencies.Input('crossfilter-indicator-scatter-fpy', 'clickData'),
      dash.dependencies.Input('date-picker-range', 'start_date'),
      dash.dependencies.Input('date-picker-range', 'end_date')])
-def update_causes(hoverData, start_date, end_date):
-    
-    PA_Selected = hoverData['points'][0]['x']
+def update_causes(clickData, start_date, end_date):
+
+    if clickData is not None:
+        PA_Selected = clickData['points'][0]['x']
+    else:
+        PA_Selected = "not selected"
 
     if PA_Selected != "not selected":
 
@@ -226,18 +274,22 @@ def update_causes(hoverData, start_date, end_date):
         fig.update_xaxes(type='category')
 
         return fig
-    
     else: 
         return dash.no_update
 
 @app.callback(
     dash.dependencies.Output('time-series-fpy', 'figure'),
-    [dash.dependencies.Input('crossfilter-indicator-scatter-fpy', 'hoverData'),
+    [dash.dependencies.Input('crossfilter-indicator-scatter-fpy', 'clickData'),
      dash.dependencies.Input('date-picker-range', 'start_date'),
      dash.dependencies.Input('date-picker-range', 'end_date')])
-def update_x_timeseries(hoverData, start_date, end_date):
+def update_x_timeseries(clickData, start_date, end_date):
+
+    if clickData is not None:
+        PA_Selected = clickData['points'][0]['x']
+    else:
+        PA_Selected = "not selected"
     
-    PA_Selected = hoverData['points'][0]['x']
+    
 
     if PA_Selected != "not selected":
 
