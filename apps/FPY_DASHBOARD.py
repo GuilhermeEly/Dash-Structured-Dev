@@ -212,21 +212,6 @@ layout = html.Div([
             )
         ],
         style={'width': '49%', 'display': 'inline-block'}),
-        
-
-        html.Div([
-
-            dcc.RadioItems(
-                id='crossfilter-yaxis-type-fpy',
-                options=[{'label': i, 'value': i} for i in ['Diario', 'Semanal', 'Mensal', 'Anual']],
-                value='Diario',
-                labelStyle={'display': 'inline-block'}
-            ),
-        ], style={
-            'width': '49%', 
-            'float': 'right', 
-            'display': 'inline-block'
-            })
     ], style={
         'borderBottom': 'thin lightgrey solid',
         'backgroundColor': 'rgb(250, 250, 250)',
@@ -246,6 +231,19 @@ layout = html.Div([
     html.Div([
         dcc.Graph(id='time-series-fpy'),
     ], style={'display': 'inline-block', 'width': '50%'}),
+    html.Div([
+
+            dcc.RadioItems(
+                id='crossfilter-yaxis-type-fpy',
+                options=[{'label': i, 'value': i} for i in ['Diario', 'Semanal', 'Mensal', 'Anual']],
+                value='Diario',
+                labelStyle={'display': 'inline-block'}
+            ),
+        ], style={
+            'width': '34%', 
+            'float': 'right', 
+            'display': 'inline-block',
+            })
 ])
 
 @app.callback(
