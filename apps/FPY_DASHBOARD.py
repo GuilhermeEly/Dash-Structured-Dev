@@ -15,8 +15,6 @@ import sqlite3
 #Caminho da aplicação
 from app import app
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-
 def get_timeseries_by_PA(start_date, end_date, PA):
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = dt.strptime(end_date, "%Y-%m-%d")
