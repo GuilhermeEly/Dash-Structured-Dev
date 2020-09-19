@@ -108,6 +108,10 @@ def get_fpy_by_Date(start_date, end_date, Filter):
             WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
         """, conn, params=(start_date, end_date))
 
+    df_products = df_update_data.drop_duplicates(subset = ["PA"])
+    df_products['PA'] = df_products['PA'].map(str)
+    df_products = df_products.set_index('PA')
+
     dfrep = df_update_data.loc[(df_update_data['STATUS'] == "R")].drop_duplicates(subset = ["NS"])
 
     SNRep = dfrep.filter(['NS'], axis=1)
@@ -135,6 +139,8 @@ def get_fpy_by_Date(start_date, end_date, Filter):
     dfFinal['PA'] = dfFinal['PA'].map(str)
 
     dfFinal['fpy'] = dfFinal['fpy'].astype(float).map("{:.2%}".format)
+
+    dfFinal = dfFinal.join(df_products, on='PA')
 
     return dfFinal
 
@@ -239,7 +245,7 @@ def update_table(n_clicks,Filter,start_date,end_date):
         
         data = get_fpy_by_Date(start_date, end_date, Filter)
 
-        fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="PA", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+        fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="NOME", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
         fig.update_xaxes(type='category')
         fig.update_layout(hovermode="x")
         fig.update_layout(clickmode='event+select')
