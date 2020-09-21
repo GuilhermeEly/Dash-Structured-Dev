@@ -23,7 +23,7 @@ c.execute(
     CREATE TABLE SZ2 (
         Z2_FILIAL INTEGER,
         Z2_SERIE INTEGER,
-        Z2_PRODUTO INTEGER,
+        Z2_PRODUTO TEXT,
         Z2_OP INTEGER,
         Z2_PEDIDO TEXT,
         Z2_NF INTEGER,

@@ -104,7 +104,7 @@ def get_causes_by_PA(start_date, end_date, PA):
 
     return dfFinal
 
-def get_fpy_by_Date(start_date, end_date, Filter):
+def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
 
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = dt.strptime(end_date, "%Y-%m-%d")
@@ -113,16 +113,37 @@ def get_fpy_by_Date(start_date, end_date, Filter):
     database = (base_path / r"..\Database\data\fpy_mockup2.db").resolve()
     conn = sqlite3.connect(database)
     
-    df_update_data = pd.read_sql_query(
-        """
-            SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
-            z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-            (date(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA, (strftime("%Y", z8.ZZ8_DATE) || strftime("%W", z8.ZZ8_DATE)) as SEMANA
-            FROM SZ2 AS z2 
-            INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-            WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
-        """, conn, params=(start_date, end_date))
+    if PA_selection == None or PA_selection == '':
+        df_update_data = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                (date(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA, (strftime("%Y", z8.ZZ8_DATE) || strftime("%W", z8.ZZ8_DATE)) as SEMANA
+                FROM SZ2 AS z2 
+                INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
+                WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
+            """, conn, params=(start_date, end_date))
+    else:
+        ###############################################################################################
+        #################Possível Bug entre a conversão do Excel para o banco de dados#################
+        ###############################################################################################
+        while len(PA_selection) < 15:
+            PA_selection += ' '
+        ###############################################################################################
+        #################Possível Bug entre a conversão do Excel para o banco de dados#################
+        ###############################################################################################
 
+        df_update_data = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                (date(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA, (strftime("%Y", z8.ZZ8_DATE) || strftime("%W", z8.ZZ8_DATE)) as SEMANA
+                FROM SZ2 AS z2 
+                INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
+                WHERE z2.Z2_PRODUTO = (?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
+            """, conn, params=(PA_selection, start_date, end_date))
+
+    print(df_update_data)
     df_products = df_update_data.drop_duplicates(subset = ["PA"])
     df_products['PA'] = df_products['PA'].map(str)
     df_products = df_products.set_index('PA')
@@ -173,7 +194,7 @@ layout = html.Div([
             ),
             html.Div([
                 dcc.Input(
-                    id='PA-Selction',
+                    id='PA-Selection',
                     placeholder='Busque um PA',
                     type='text',
                     style={
@@ -209,7 +230,7 @@ layout = html.Div([
                     'border-top-right-radius': '6px',
                     'border-bottom-right-radius': '6px',
                 }
-            )
+            ),
         ],
         style={'width': '49%', 'display': 'inline-block'}),
     ], style={
@@ -251,12 +272,13 @@ layout = html.Div([
     [Input('submit-button-state', 'n_clicks')],
     [State('crossfilter-yaxis-type-fpy', 'value'),
      State('date-picker-range', 'start_date'),
-     State('date-picker-range', 'end_date')])
-def update_table(n_clicks,Filter,start_date,end_date):
+     State('date-picker-range', 'end_date'),
+     State('PA-Selection', 'value')])
+def update_table(n_clicks,Filter,start_date,end_date,PA_selection):
 
     if Filter!= 'not selected' and start_date!=None and end_date!=None:
         
-        data = get_fpy_by_Date(start_date, end_date, Filter)
+        data = get_fpy_by_Date(start_date, end_date, Filter, PA_selection)
 
         fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="NOME", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
         fig.update_xaxes(type='category')
