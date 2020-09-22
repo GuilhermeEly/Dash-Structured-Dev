@@ -29,8 +29,9 @@ def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
         #################Possível Bug entre a conversão do Excel para o banco de dados#################
         ###############################################################################################
         PA_selection = PA_selection.replace(' ', '')
-        while len(PA_selection) < 15:
-            PA_selection += ' '
+        if PA_selection.isdigit()!= True:
+            while len(PA_selection) < 15:
+                PA_selection += ' '
         ###############################################################################################
         #################Possível Bug entre a conversão do Excel para o banco de dados#################
         ###############################################################################################
@@ -277,3 +278,82 @@ def get_causes_by_PA(start_date, end_date, PA):
     dfFinal = dftest.sort_values(by=['Reprovações'], ascending=False)
 
     return dfFinal
+
+
+
+def get_fpy_geral(start_date, end_date, PA_selection):
+    start_date = dt.strptime(start_date, "%Y-%m-%d")
+    end_date = dt.strptime(end_date, "%Y-%m-%d")
+
+    base_path = Path(__file__).parent
+    database = (base_path / r"..\..\Database\data\fpy_mockup2.db").resolve()
+    conn = sqlite3.connect(database)
+    
+    if PA_selection == None or PA_selection == '':
+        df_update_data = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                (date(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
+                FROM SZ2 AS z2 
+                INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
+                WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
+            """, conn, params=(start_date, end_date))
+    else:
+        ###############################################################################################
+        #################Possível Bug entre a conversão do Excel para o banco de dados#################
+        ###############################################################################################
+        PA_selection = PA_selection.replace(' ', '')
+        while len(PA_selection) < 15:
+            PA_selection += ' '
+        ###############################################################################################
+        #################Possível Bug entre a conversão do Excel para o banco de dados#################
+        ###############################################################################################
+
+        df_update_data = pd.read_sql_query(
+            """
+                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
+                (date(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA, (strftime("%Y", z8.ZZ8_DATE) || strftime("%W", z8.ZZ8_DATE)) as SEMANA
+                FROM SZ2 AS z2 
+                INNER JOIN ZZ8 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
+                WHERE z2.Z2_PRODUTO = (?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
+            """, conn, params=(PA_selection, start_date, end_date))
+
+    df_products = df_update_data.drop_duplicates(subset = ["PA"])
+    df_products['PA'] = df_products['PA'].map(str)
+    df_products = df_products.set_index('PA')
+
+    dfrep = df_update_data.loc[(df_update_data['STATUS'] == "R")].drop_duplicates(subset = ["NS"])
+
+    SNRep = dfrep.filter(['NS'], axis=1)
+
+    dfRlyApproved = df_update_data[~df_update_data.NS.isin(SNRep.NS)].drop_duplicates(subset = ["NS"])
+
+    dftest = dfrep.groupby(['PA']).size().reset_index(name='counts')
+
+    dfApprTest = dfRlyApproved.groupby(['PA']).size().reset_index(name='counts')
+
+    dfFinal = pd.merge(dftest, dfApprTest, how='outer', on='PA').fillna(0)
+
+    dfFinal['fpy'] = dfFinal['counts_y'] /( dfFinal['counts_y'] + dfFinal['counts_x'])
+
+    dfFinal['Produzido'] = dfFinal['counts_y'] + dfFinal['counts_x']
+
+    dfFinal.rename(columns={"counts_y": "Aprovadas", "counts_x": "Reprovadas"}, inplace=True)
+
+    dfFinal[['PA', 'fpy']].fillna(0)
+
+    dfFinal = dfFinal.sort_values(by=['fpy'])
+
+    dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+
+    dfFinal['PA'] = dfFinal['PA'].map(str)
+
+    dfFinal['fpy'] = dfFinal['fpy'].astype(float).map("{:.2%}".format)
+
+    dfFinal = dfFinal.join(df_products, on='PA')
+
+    FPY_Total = (dfFinal['Aprovadas'].sum() /( dfFinal['Aprovadas'].sum() + dfFinal['Reprovadas'].sum()))*100
+
+    return round(FPY_Total,2)

@@ -15,7 +15,7 @@ import sqlite3
 #Caminho da aplicação
 from app import app
 #funcoes
-from apps.function.queries_database import *
+from apps.function.queries_database import get_fpy_by_Date, get_causes_by_PA, get_timeseries_by_PA, get_fpy_geral
 
 layout = html.Div([
     html.Div(
@@ -48,8 +48,11 @@ layout = html.Div([
                         children='Submit',
                         className = 'Submit-Button'
                     ),
+                    
                 ]
-            )
+            ),
+            html.Div(id='fixed-text', children='First Pass Yield Geral:',style={'display': 'inline','margin-left': '150px', 'padding':'6px 24px','font':'Arial'}),
+            html.Div(id='output-fpy-button', children='    ',style={'display': 'inline','margin-left': '0px', 'background-color': '#ffffff', 'padding':'6px 24px','font':'Arial', 'border': '2px solid #ccc', 'border-radius': '50px 20px'})
         ]
     ),
     
@@ -175,3 +178,19 @@ def update_x_timeseries(clickData, start_date, end_date, Filter):
     
     else: 
         return dash.no_update
+
+@app.callback(
+    Output('output-fpy-button', 'children'),
+    [Input('submit-button-state', 'n_clicks')],
+    [State('date-picker-range', 'start_date'),
+     State('date-picker-range', 'end_date'),
+     State('PA-Selection', 'value')])
+def update_total_fpy(n_clicks,start_date,end_date,PA_selection):
+
+    if start_date!=None and end_date!=None:
+        
+        data = get_fpy_geral(start_date, end_date, PA_selection)
+
+        return '{}%'.format(data)
+    else:
+        return ''
