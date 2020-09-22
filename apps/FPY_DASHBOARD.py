@@ -216,19 +216,37 @@ layout = html.Div([
         ]
     ),
     
-
+    dcc.Loading(id = "loading-indicator-scatter-fpy", 
+                children=
+                [
+                    html.Div([
+                        dcc.Graph(
+                            id='crossfilter-indicator-scatter-fpy',
+                            hoverData={'points': [{'x': 'not selected'}]}
+                        )
+                    ], style={'width': '100%', 'padding': '0 20'}),
+                ], type="graph"),
     html.Div([
-        dcc.Graph(
-            id='crossfilter-indicator-scatter-fpy',
-            hoverData={'points': [{'x': 'not selected'}]}
-        )
-    ], style={'width': '100%', 'padding': '0 20'}),
-    html.Div([
-        dcc.Graph(id='fpy-causes'),
-    ], style={'display': 'inline-block', 'width': '50%'}),
-    html.Div([
-        dcc.Graph(id='time-series-fpy'),
-    ], style={'display': 'inline-block', 'width': '50%'}),
+        html.Div([
+            dcc.Loading(id = "loading-fpy-causes", 
+                    children=
+                    [
+                        html.Div([
+                            dcc.Graph(id='fpy-causes'),
+                        ], style={'display': 'inline-block'}),
+                    ], type="graph"),
+        ],style={'width': '50%'}),
+        html.Div([
+            dcc.Loading(id = "loading-time-series-fpy", 
+                    children=
+                    [
+                        html.Div([
+                            dcc.Graph(id='time-series-fpy'),
+                        ], style={'display': 'inline-block'}),
+                    ], type="graph"),
+        ],style={'width': '50%'})
+    ],style={'display': 'flex', 'width': '100%'}),
+    
     html.Div([
             dcc.RadioItems(
                 id='crossfilter-yaxis-type-fpy',
