@@ -144,7 +144,6 @@ def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
                 WHERE z2.Z2_PRODUTO = (?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
             """, conn, params=(PA_selection, start_date, end_date))
 
-    print(df_update_data)
     df_products = df_update_data.drop_duplicates(subset = ["PA"])
     df_products['PA'] = df_products['PA'].map(str)
     df_products = df_products.set_index('PA')
@@ -182,63 +181,40 @@ def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
     return dfFinal
 
 layout = html.Div([
-    html.Div([
-
-        html.Div([
-            dcc.DatePickerRange(
-                id='date-picker-range',
-                min_date_allowed=dt(2020, 8, 1),
-                max_date_allowed=dt(2020, 8, 31),
-                start_date_placeholder_text='Data início',
-                end_date_placeholder_text='Data fim',
-                display_format='DD/MM/YYYY'
-            ),
-            html.Div([
-                dcc.Input(
-                    id='PA-Selection',
-                    placeholder='Busque um PA',
-                    type='text',
-                    style={
-                        'width':'200px', 
-                        'height':'40px', 
-                        'margin-left': '50px', 
-                        'verticalAlign':'middle', 
-                        'font-size':'22px', 
-                        'border':'1px solid #ccc'
-                    }
-                )
-            ],style={'display': 'inline-block'}),
-            html.Button(
-                id='submit-button-state', 
-                n_clicks=0, 
-                children='Submit',
-                style={
-                    'box-shadow':'inset 0px 1px 0px 0px #ffffff',
-                    'background':'linear-gradient(to bottom, #f9f9f9 5%, #e9e9e9 100%)',
-                    'background-color':'#f9f9f9;',
-                    'border':'1px solid #dcdcdc',
-                    'display':'inline-block',
-                    'cursor':'pointer',
-                    'color':'#666666',
-                    'font-family':'Arial',
-                    'font-size':'15px',
-                    'font-weight':'bold',
-                    'padding':'6px 24px',
-                    'text-decoration':'none',
-                    'text-shadow':'0px 1px 0px #ffffff',
-                    'height':'44px',
-                    'verticalAlign':'middle',
-                    'border-top-right-radius': '6px',
-                    'border-bottom-right-radius': '6px',
-                }
-            ),
-        ],
-        style={'width': '49%', 'display': 'inline-block'}),
-    ], style={
-        'borderBottom': 'thin lightgrey solid',
-        'backgroundColor': 'rgb(250, 250, 250)',
-        'padding': '10px 5px'
-    }),
+    html.Div(
+        className='Header-Style',
+        children=
+        [
+            html.Div(
+                className='Header-Disposition',
+                children =
+                [
+                    dcc.DatePickerRange(
+                        id='date-picker-range',
+                        min_date_allowed=dt(2020, 8, 1),
+                        max_date_allowed=dt(2020, 8, 31),
+                        start_date_placeholder_text='Data início',
+                        end_date_placeholder_text='Data fim',
+                        display_format='DD/MM/YYYY'
+                    ),
+                    html.Div([
+                        dcc.Input(
+                            className = 'PA-Input',
+                            id='PA-Selection',
+                            placeholder='Busque um PA',
+                            type='text',
+                        )
+                    ],style={'display': 'inline-block'}),
+                    html.Button(
+                        id='submit-button-state', 
+                        n_clicks=0, 
+                        children='Submit',
+                        className = 'Submit-Button'
+                    ),
+                ]
+            )
+        ]
+    ),
     
 
     html.Div([
@@ -254,7 +230,6 @@ layout = html.Div([
         dcc.Graph(id='time-series-fpy'),
     ], style={'display': 'inline-block', 'width': '50%'}),
     html.Div([
-
             dcc.RadioItems(
                 id='crossfilter-yaxis-type-fpy',
                 options=[{'label': i, 'value': i} for i in ['Diario', 'Semanal', 'Mensal', 'Anual']],
