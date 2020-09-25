@@ -304,8 +304,9 @@ def get_fpy_geral(start_date, end_date, PA_selection):
         #################Possível Bug entre a conversão do Excel para o banco de dados#################
         ###############################################################################################
         PA_selection = PA_selection.replace(' ', '')
-        while len(PA_selection) < 15:
-            PA_selection += ' '
+        if PA_selection.isdigit()!= True:
+            while len(PA_selection) < 15:
+                PA_selection += ' '
         ###############################################################################################
         #################Possível Bug entre a conversão do Excel para o banco de dados#################
         ###############################################################################################
