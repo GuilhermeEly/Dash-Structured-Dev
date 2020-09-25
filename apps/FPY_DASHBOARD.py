@@ -51,7 +51,31 @@ layout = html.Div([
                     
                 ]
             ),
-            html.Div(id='fixed-text', children='First Pass Yield Geral:',style={'display': 'inline','margin-left': '150px', 'padding':'6px 24px','font':'Arial'}),
+            html.Div(className = 'fpy-header-filter', id='fixed-text', children=[
+                                    'FPY de',
+                                    html.Div([
+                                        dcc.Input(
+                                            className = 'fpy-filter',
+                                            id='fpy-filter-low',
+                                            value='0',
+                                            type='number',
+                                            min='0',
+                                            max='100'
+                                        )
+                                    ],style={'display': 'inline'}),
+                                    'à',
+                                    html.Div([
+                                        dcc.Input(
+                                            className = 'fpy-filter',
+                                            id='fpy-filter-high',
+                                            value='100',
+                                            type='number',
+                                            min='0',
+                                            max='100'
+                                        )
+                                    ],style={'display': 'inline'}),
+                                    'First Pass Yield Geral:'
+                                    ],style={'display': 'inline','margin-left': '50px', 'padding':'6px 24px','font':'Arial'}),
             html.Div(id='output-fpy-button', children='    ',style={'display': 'inline','margin-left': '0px', 'background-color': '#ffffff', 'padding':'6px 24px','font':'Arial', 'border': '2px solid #ccc', 'border-radius': '50px 20px'})
         ]
     ),
