@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import sqlite3
 
-def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
+def get_fpy_by_Date(start_date, end_date, Filter, PA_selection, limit_High, limit_Low):
 
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = dt.strptime(end_date, "%Y-%m-%d")
@@ -73,6 +73,8 @@ def get_fpy_by_Date(start_date, end_date, Filter, PA_selection):
     dfFinal = dfFinal.sort_values(by=['fpy'])
 
     dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+
+    dfFinal = dfFinal[(dfFinal['fpy'] >= float(limit_Low)/100.0) & (dfFinal['fpy'] <= float(limit_High)/100.0)]
 
     dfFinal['PA'] = dfFinal['PA'].map(str)
 
@@ -281,7 +283,7 @@ def get_causes_by_PA(start_date, end_date, PA):
 
 
 
-def get_fpy_geral(start_date, end_date, PA_selection):
+def get_fpy_geral(start_date, end_date, PA_selection, limit_High, limit_Low):
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = dt.strptime(end_date, "%Y-%m-%d")
 
@@ -348,6 +350,8 @@ def get_fpy_geral(start_date, end_date, PA_selection):
     dfFinal = dfFinal.sort_values(by=['fpy'])
 
     dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+
+    dfFinal = dfFinal[(dfFinal['fpy'] >= float(limit_Low)/100.0) & (dfFinal['fpy'] <= float(limit_High)/100.0)]
 
     dfFinal['PA'] = dfFinal['PA'].map(str)
 

@@ -75,7 +75,7 @@ layout = html.Div([
                                         )
                                     ],style={'display': 'inline'}),
                                     'First Pass Yield Geral:'
-                                    ],style={'display': 'inline','margin-left': '50px', 'padding':'6px 24px','font':'Arial'}),
+                                    ],style={'display': 'inline','margin-left': '10px', 'padding':'6px 24px','font':'Arial'}),
             html.Div(id='output-fpy-button', children='    ',style={'display': 'inline','margin-left': '0px', 'background-color': '#ffffff', 'padding':'6px 24px','font':'Arial', 'border': '2px solid #ccc', 'border-radius': '50px 20px'})
         ]
     ),
@@ -131,12 +131,23 @@ layout = html.Div([
     [State('crossfilter-yaxis-type-fpy', 'value'),
      State('date-picker-range', 'start_date'),
      State('date-picker-range', 'end_date'),
-     State('PA-Selection', 'value')])
-def update_table(n_clicks,Filter,start_date,end_date,PA_selection):
+     State('PA-Selection', 'value'),
+     State('fpy-filter-low', 'value'),
+     State('fpy-filter-high', 'value')])
+def update_table(n_clicks,Filter,start_date,end_date,PA_selection,limit_Low,limit_High):
+
+    if float(limit_High)<float(limit_Low):
+        limit_High = 100
+        limit_Low = 0
+
+    if limit_High==None or str(limit_High).isdigit()==False:
+        limit_High = 100
+    if limit_Low==None or str(limit_Low).isdigit()==False:
+        limit_Low = 0
 
     if Filter!= 'not selected' and start_date!=None and end_date!=None:
         
-        data = get_fpy_by_Date(start_date, end_date, Filter, PA_selection)
+        data = get_fpy_by_Date(start_date, end_date, Filter, PA_selection, limit_High, limit_Low)
 
         fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="NOME", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
         fig.update_xaxes(type='category')
@@ -208,12 +219,24 @@ def update_x_timeseries(clickData, start_date, end_date, Filter):
     [Input('submit-button-state', 'n_clicks')],
     [State('date-picker-range', 'start_date'),
      State('date-picker-range', 'end_date'),
-     State('PA-Selection', 'value')])
-def update_total_fpy(n_clicks,start_date,end_date,PA_selection):
+     State('PA-Selection', 'value'),
+     State('fpy-filter-low', 'value'),
+     State('fpy-filter-high', 'value')])
+def update_total_fpy(n_clicks,start_date,end_date,PA_selection,limit_Low,limit_High):
+
+    if float(limit_High)<float(limit_Low):
+        limit_High = 100
+        limit_Low = 0
+
+    if limit_High==None or str(limit_High).isdigit()==False:
+        limit_High = 100
+
+    if limit_Low==None or str(limit_Low).isdigit()==False:
+        limit_Low = 0
 
     if start_date!=None and end_date!=None:
         
-        data = get_fpy_geral(start_date, end_date, PA_selection)
+        data = get_fpy_geral(start_date, end_date, PA_selection, limit_High, limit_Low)
 
         return '{}%'.format(data)
     else:
