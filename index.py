@@ -5,14 +5,13 @@ from dash.dependencies import Input, Output
 from app import app
 from apps import FPY_DASHBOARD
 
-
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
 
 index_page = html.Div([
-    dcc.Link('Ir para app FPY DASHBOARD', href='/apps/FPY_DASHBOARD'),
+    dcc.Link('Ir para app FPY DASHBOARD', href='/apps/FPY_DASHBOARD')
 ])
 
 
@@ -26,7 +25,7 @@ def display_page(pathname):
 
 if __name__ == '__main__':
     #Para rodar em Desenvolvimento
-    #app.run_server(debug=True)
+    app.run_server(debug=True)
 
     #Para rodar em LAN
-    app.run_server(debug=False, port=8080, host='0.0.0.0')
+    #app.run_server(debug=False, port=8080, host='0.0.0.0')
