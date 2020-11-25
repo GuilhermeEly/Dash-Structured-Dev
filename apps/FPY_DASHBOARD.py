@@ -16,7 +16,11 @@ import pandas as pd
 #Caminho da aplicação
 from app import app
 #funcoes
-from apps.function.dashboard.queries_dashboard import get_fpy_by_Date, get_causes_by_PA, get_timeseries_by_PA, get_fpy_geral
+from apps.controllers.product_fpy.general_fpy import get_fpy_geral
+from apps.controllers.product_fpy.group_by_date import get_timeseries_by_PA
+from apps.controllers.product_fpy.causes import get_causes_by_PA
+from apps.controllers.product_fpy.fpy_by_product import get_fpy_by_Date
+
 
 layout = html.Div([
     html.Div(
