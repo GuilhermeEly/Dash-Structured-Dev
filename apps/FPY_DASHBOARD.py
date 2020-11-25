@@ -235,21 +235,24 @@ def update_x_timeseries(clickData, start_date, end_date, Filter):
 
         title = '<b>{} - {}</b>'.format(PA_Selected, Filter)
         if Filter == 'Diario':
-
-            # dt_all = pd.date_range(start=df_timeseries['DateTime'].iloc[0],end=df_timeseries['DateTime'].iloc[-1])
-            # dt_obs = [d.strftime("%Y-%m-%d") for d in df_timeseries['DateTime']]
-            # dt_breaks = [d for d in dt_all.strftime("%Y-%m-%d").tolist() if not d in dt_obs]
-
-            # df_timeseries['Width'] = 0.1
-            # print(df_timeseries['Width'].to_numpy())
-            # print(df_timeseries)
-            # print(dt_breaks)
-            # print(df_timeseries['Width'].to_list())
-            fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
-            # fig.update_xaxes(
-            #                 rangebreaks=[dict(values=dt_breaks)] # hide dates with no values
-            #             )
-            # fig.update_traces(width = df_timeseries['Width'].to_list())
+            print(len(df_timeseries.index))
+            if(len(df_timeseries.index)>3):
+                dt_all = pd.date_range(start=df_timeseries['DateTime'].iloc[0],end=df_timeseries['DateTime'].iloc[-1])
+                dt_obs = [d.strftime("%Y-%m-%d") for d in df_timeseries['DateTime']]
+                dt_breaks = [d for d in dt_all.strftime("%Y-%m-%d").tolist() if not d in dt_obs]
+                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+                fig.update_xaxes(
+                    rangebreaks=[dict(values=dt_breaks)] # hide dates with no values
+                )
+                # df_timeseries['Width'] = 0.1
+                #fig.update_traces(width = df_timeseries['Width'].to_list())
+                # print(df_timeseries['Width'].to_numpy())
+                # print(df_timeseries)
+                # print(dt_breaks)
+                # print(df_timeseries['Width'].to_list())
+            else:
+                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+            
         else:
             fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
             fig.update_layout(xaxis_type='category')
