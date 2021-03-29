@@ -6,11 +6,12 @@ import pandas as pd
 import sqlite3
 import pyodbc
 import time
-from apps.models.product_fpy.connection import Database
+#from apps.models.product_fpy.connection import Database
+from apps.models.product_fpy.FPYQueries import queriesFPY
 
 def get_causes_by_PA(start_date, end_date, PA):
 
-    fetch = Database()
+    fetch = queriesFPY()
 
     start_date = start_date.replace('-', '')
     end_date = end_date.replace('-', '')

@@ -6,11 +6,11 @@ import pandas as pd
 import sqlite3
 import pyodbc
 import time
-from apps.models.product_fpy.connection import Database
+from apps.models.product_fpy.FPYQueries import queriesFPY
 
 def get_fpy_by_Date(start_date, end_date, Filter, PA_selection, limit_High, limit_Low):
 
-    fetch = Database()
+    fetch = queriesFPY()
 
     start_date = start_date.replace('-', '')
     end_date = end_date.replace('-', '')

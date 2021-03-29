@@ -226,11 +226,11 @@ def update_causes(clickData, start_date, end_date):
 
 @app.callback(
     Output('time-series-fpy', 'figure'),
-    [Input('crossfilter-indicator-scatter-fpy', 'clickData')],
+    [Input('crossfilter-indicator-scatter-fpy', 'clickData'),
+     Input('crossfilter-yaxis-type-fpy', 'value')],
     [State('date-picker-range', 'start_date'),
-     State('date-picker-range', 'end_date'),
-     State('crossfilter-yaxis-type-fpy', 'value')])
-def update_x_timeseries(clickData, start_date, end_date, Filter):
+     State('date-picker-range', 'end_date')])
+def update_x_timeseries(clickData, Filter, start_date, end_date):
 
     if clickData is not None:
         PA_Selected = clickData['points'][0]['x']
@@ -262,7 +262,7 @@ def update_x_timeseries(clickData, start_date, end_date, Filter):
                 fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
             
         else:
-            fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+            fig = px.bar(df_timeseries, x="Filtro", y="fpy", title=title, hover_name="fpy", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
             fig.update_layout(xaxis_type='category')
 
         fig.update_layout(
