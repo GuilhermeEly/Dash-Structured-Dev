@@ -6,43 +6,19 @@ import pandas as pd
 import sqlite3
 import pyodbc
 import time
+from apps.models.product_fpy.connection import Database
 
 def get_fpy_by_Date(start_date, end_date, Filter, PA_selection, limit_High, limit_Low):
 
+    fetch = Database()
+
     start_date = start_date.replace('-', '')
     end_date = end_date.replace('-', '')
-
-    server = 'nobrpoaerp01' 
-    database = 'FPY' 
-    username = 'FPY' 
-    password = 'FPY@2020!' 
-    conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
     
     if PA_selection == None or PA_selection == '':
-        df_update_data = pd.read_sql_query(
-            """
-                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
-                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-                TRY_CONVERT(date,(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
-                FROM SZ2990 AS z2 
-                INNER JOIN ZZ8990 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-                WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
-            """, conn, params=(start_date, end_date))
+        df_update_data = fetch.queryFpyByDate(startDate=start_date, endDate=end_date)
     else:
-        PA_selection = PA_selection.replace(' ', '')
-        if PA_selection.isdigit()!= True:
-            while len(PA_selection) < 15:
-                PA_selection += ' '
-
-        df_update_data = pd.read_sql_query(
-            """
-                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
-                z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-                TRY_CONVERT(date,(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
-                FROM SZ2990 AS z2 
-                INNER JOIN ZZ8990 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-                WHERE z2.Z2_PRODUTO = (?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
-            """, conn, params=(PA_selection, start_date, end_date))
+        df_update_data = fetch.queryFpyByDateAndPA(startDate=start_date, endDate=end_date, PASelected=PA_selection)
 
     df_products = df_update_data.drop_duplicates(subset = ["PA"])
     df_products['PA'] = df_products['PA'].map(str)

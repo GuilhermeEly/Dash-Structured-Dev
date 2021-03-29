@@ -11,7 +11,7 @@ def get_timeseries_by_PA(start_date, end_date, PA, Filterx):
     start_date = start_date.replace('-', '')
     end_date = end_date.replace('-', '')
 
-    server = 'nobrpoaerp01' 
+    server = 'nobrcasql01' 
     database = 'FPY' 
     username = 'FPY' 
     password = 'FPY@2020!' 

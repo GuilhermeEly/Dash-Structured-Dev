@@ -187,12 +187,20 @@ def update_causes(clickData, start_date, end_date):
 
     if clickData is not None:
         PA_Selected = clickData['points'][0]['x']
+        Total_Rep = clickData['points'][0]['customdata']
     else:
         PA_Selected = "not selected"
 
     if PA_Selected != "not selected":
 
         df_causes= get_causes_by_PA(start_date, end_date, PA_Selected)
+
+        Total = df_causes['Reprovações'].sum()
+
+        if (Total_Rep[1]-Total) > 0:
+            df_causes.loc[-1] = ['Não iniciou teste', 'R', Total_Rep[1]-Total]
+
+            df_causes = df_causes.sort_values(by=['Reprovações'], ascending=False)
 
         title = '<b>{} - Causas</b>'.format(PA_Selected)
 
