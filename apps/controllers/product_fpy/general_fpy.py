@@ -21,7 +21,7 @@ def get_fpy_geral(start_date, end_date, PA_selection, limit_High, limit_Low):
         df_update_data = fetch.queryFpyByDateAndPA(startDate=start_date, endDate=end_date, PASelected=PA_selection)
 
     df_products = df_update_data.drop_duplicates(subset = ["PA"])
-    df_products['PA'] = df_products['PA'].map(str)
+
     df_products = df_products.set_index('PA')
 
     dfrep = df_update_data.loc[(df_update_data['STATUS'] == "R")].drop_duplicates(subset = ["NS"])
@@ -46,7 +46,7 @@ def get_fpy_geral(start_date, end_date, PA_selection, limit_High, limit_Low):
 
     dfFinal = dfFinal.sort_values(by=['fpy'])
 
-    dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+    dfFinal.loc[(dfFinal['fpy'] == 0), 'fpy'] = 0.005
 
     dfFinal = dfFinal[(dfFinal['fpy'] >= float(limit_Low)/100.0) & (dfFinal['fpy'] <= float(limit_High)/100.0)]
 

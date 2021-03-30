@@ -24,7 +24,7 @@ def get_timeseries_by_PA(start_date, end_date, PA, Filterx):
         df_update_data['Filtro'] = df_update_data['DATA'].dt.strftime('%Y-%m')
     if Filterx == 'Anual':
         df_update_data['Filtro'] = df_update_data['DATA'].dt.strftime('%Y')
-    print('query terminada')
+
     #Pega todos os produtos reprovados pelo menos em uma etapa, removendo os duplicados
     dfrep = df_update_data.loc[(df_update_data['STATUS'] == "R")].drop_duplicates(subset = ["NS"])
 
@@ -61,7 +61,7 @@ def get_timeseries_by_PA(start_date, end_date, PA, Filterx):
         dfFinal = dfFinal.sort_values(by=['DATA'])
 
         #Para melhor visualizar os dias com FPY de 0% foi determinado o valor abaixo para ser plotado
-        dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+        dfFinal.loc[(dfFinal['fpy'] == 0), 'fpy'] = 0.005
 
         #Converte a coluna para o formato YYYY-MM-DD para realizar o plot
         dfFinal['DateTime'] = pd.to_datetime(dfFinal['DATA'].astype(str), format='%Y-%m-%d')
@@ -96,7 +96,7 @@ def get_timeseries_by_PA(start_date, end_date, PA, Filterx):
         dfFinal = dfFinal.sort_values(by=['Filtro'])
 
         #Para melhor visualizar os dias com FPY de 0% foi determinado o valor abaixo para ser plotado
-        dfFinal.fpy[dfFinal.fpy == 0] = 0.005
+        dfFinal.loc[(dfFinal['fpy'] == 0), 'fpy'] = 0.005
 
         #Converte a coluna para o formato YYYY-MM-DD para realizar o plot
         dfFinal['DateTime'] = dfFinal['Filtro'].astype(str)
