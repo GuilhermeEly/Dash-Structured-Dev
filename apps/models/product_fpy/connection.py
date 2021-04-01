@@ -9,7 +9,7 @@ import time
 
 class connectDatabase:
 
-    connectionType = 'test'
+    connectionType = ''
 
     testData = "C:\\Users\\gely\\Projects\\Dash-Structured\\testdatabase\\testdb.db"
 
