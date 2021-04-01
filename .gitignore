@@ -3,3 +3,4 @@ Database/data/fpy_mockup2.db
 *.pyc
 start_venv.bat
 venv
+testdatabase
