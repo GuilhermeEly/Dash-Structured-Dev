@@ -17,14 +17,14 @@ class connectDatabase:
     database = 'FPY' #Trocar para uma variavel de ambiente
     username = 'FPY' #Trocar para uma variavel de ambiente
     password = 'FPY@2020!' #Trocar para uma variavel de ambiente
-    driver = 'SQL Server'
-    dbc = 'DRIVER={'+driver+'};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password
+    driverWindows = 'SQL Server'
+    driverLinux = 'ODBC Driver 17 for SQL Server'
+    dbc = 'DRIVER={'+driverWindows+'};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password
 
     realDBZZ8 = "TRY_CONVERT(date,(z8.ZZ8_DATE))"
     realDBZZ9 = "TRY_CONVERT(date,(z9.ZZ9_DATE))"
-    testDBZZ8 = "date(z8.ZZ8_DATE)"
-    testDBZZ9 = "date(z9.ZZ9_DATE)"
-
+    testDBZZ8 = "substr(z8.ZZ8_DATE, 1, 4) || '-' || substr(z8.ZZ8_DATE, 5, 2) || '-' || substr(z8.ZZ8_DATE, 7)"
+    testDBZZ9 = "substr(z9.ZZ9_DATE, 1, 4) || '-' || substr(z9.ZZ9_DATE, 5, 2) || '-' || substr(z9.ZZ9_DATE, 7)"
 
 
     conn = ''
