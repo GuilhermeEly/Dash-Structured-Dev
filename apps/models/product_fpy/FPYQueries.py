@@ -16,7 +16,7 @@ class queriesFPY(connectDatabase):
         sql = """
                 SELECT z2.Z2_PRODUTO as PA, z9.ZZ9_SERIAL as NS, z9.ZZ9_STEP as STEP,
                 z9.ZZ9_TIPO as TIPO, z9.ZZ9_STATUS as STATUS,z9.R_E_C_N_O_ as RECNO,
-                TRY_CONVERT(date,(z9.ZZ9_DATE)) as DATA
+                """+self.choosenDBZZ9+""" as DATA
                 FROM SZ2990 AS z2 
                 INNER JOIN ZZ9990 AS z9 ON z2.Z2_SERIE=z9.ZZ9_SERIAL
                 WHERE z2.Z2_PRODUTO = (?) AND z9.ZZ9_DATE BETWEEN (?) AND (?) ORDER BY RECNO
@@ -28,14 +28,12 @@ class queriesFPY(connectDatabase):
 
     def queryFpyByDate(self, startDate, endDate):
 
-        sql = """
-                SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
+        sql = """ SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
                 z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-                TRY_CONVERT(date,(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
+              """+self.choosenDBZZ8+""" as DATA, z8.ZZ8_HOUR as HORA
                 FROM SZ2990 AS z2 
                 INNER JOIN ZZ8990 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
-                WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
-            """
+                WHERE z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA"""
 
         df = pd.read_sql_query(sql, self.conn, params=(startDate, endDate))
 
@@ -51,7 +49,7 @@ class queriesFPY(connectDatabase):
         sql = """
                 SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
                 z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-                TRY_CONVERT(date,(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
+                """+self.choosenDBZZ8+""" as DATA, z8.ZZ8_HOUR as HORA
                 FROM SZ2990 AS z2 
                 INNER JOIN ZZ8990 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
                 WHERE z2.Z2_PRODUTO = (?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY DATA
@@ -68,7 +66,7 @@ class queriesFPY(connectDatabase):
         sql = """
                 SELECT z2.Z2_PRODUTO as PA, z8.ZZ8_NUMEQ as NS, z8.ZZ8_PNAME as NOME,
                 z8.ZZ8_TIPO as TIPO, z8.ZZ8_NUMBER as NS_JIGA, z8.ZZ8_STATUS as STATUS,
-                TRY_CONVERT(date,(z8.ZZ8_DATE)) as DATA, z8.ZZ8_HOUR as HORA
+                """+self.choosenDBZZ8+""" as DATA, z8.ZZ8_HOUR as HORA
                 FROM SZ2990 AS z2 
                 INNER JOIN ZZ8990 AS z8 ON z2.Z2_SERIE=z8.ZZ8_NUMEQ
                 WHERE z2.Z2_PRODUTO=(?) AND z8.ZZ8_DATE BETWEEN (?) AND (?) ORDER BY NS, DATA, HORA
