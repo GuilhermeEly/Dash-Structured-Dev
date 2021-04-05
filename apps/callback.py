@@ -43,7 +43,7 @@ def update_table(n_clicks,Filter,start_date,end_date,PA_selection,limit_Low,limi
         
         data = get_fpy_by_Date(start_date, end_date, Filter, PA_selection, limit_High, limit_Low)
 
-        fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="NOME", hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+        fig = px.bar(data, x="PA", y="fpy", title='First Pass Yield',hover_name="NOME", color="Produzido", color_continuous_scale='Teal', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
         fig.update_xaxes(type='category')
         fig.update_layout(
             hovermode="x",
@@ -137,16 +137,16 @@ def update_x_timeseries(clickData, Filter, start_date, end_date):
                 dt_all = pd.date_range(start=df_timeseries['DateTime'].iloc[0],end=df_timeseries['DateTime'].iloc[-1])
                 dt_obs = [d.strftime("%Y-%m-%d") for d in df_timeseries['DateTime']]
                 dt_breaks = [d for d in dt_all.strftime("%Y-%m-%d").tolist() if not d in dt_obs]
-                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='redor', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='Teal', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
                 fig.update_xaxes(
                     rangebreaks=[dict(values=dt_breaks)] # hide dates with no values
                 )
                 
             else:
-                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='redor', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+                fig = px.bar(df_timeseries, x="DateTime", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='Teal', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
             
         else:
-            fig = px.bar(df_timeseries, x="Filtro", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='redor', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
+            fig = px.bar(df_timeseries, x="Filtro", y="fpy", title=title, hover_name="fpy",color="Produzido",color_continuous_scale='Teal', hover_data=["Aprovadas", "Reprovadas", "Produzido"])
             fig.update_layout(xaxis_type='category')
 
         fig.update_layout(
